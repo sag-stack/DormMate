@@ -349,7 +349,7 @@ def announcements_view(request):
             announcement.household = household
             announcement.posted_by = request.user
             announcement.save()
-            messages.success(request, f"{request.user.profile.display_name} added a New Announcement: {announcement.announcement_name}")
+            messages.success(request, f"{request.user.profile.display_name} added a New Announcement: {announcement.title}")
 
             return redirect('announcements')
             
