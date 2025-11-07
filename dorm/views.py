@@ -262,7 +262,7 @@ def grocery_view(request):
                 item.household = household
                 item.added_by = request.user
                 item.save()
-                messages.success(request, f"{request.user.profile.display_name} added a New Grocery Item: {item.title}")
+                messages.success(request, f"{request.user.profile.display_name} added a New Grocery Item: {item.item_name}")
 
                 return redirect('grocery') # Redirect to clear the form
         
