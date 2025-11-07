@@ -1,0 +1,44 @@
+{% extends "dorm/base.html" %}
+
+{% block title %}Chores{% endblock %}
+{% block page_title %}Chores{% endblock %}
+
+{% block content %}
+    <div class="card">
+        <div class="card-header"><h2>Your Chores</h2></div>
+        {% for chore in my_chores %}
+            <div class="list-item">
+                <div class="list-item-content">
+                    <strong>{{ chore.title }}</strong>
+                    <span>You • Due {{ chore.due_date|date:"Y-m-d" }}</span>
+                </div>
+                
+                <form method="post" style="margin:0;">
+                    {% csrf_token %}
+                    <input type="hidden" name="chore-id" value="{{ chore.id }}">
+                    <button type="submit" name="mark-done" style="background-color: var(--primary-blue); color: white; padding: 8px 16px; border-radius: 6px; text-decoration: none; font-size: 14px; font-weight: 600; border: none; cursor: pointer;">
+                        Done
+                    </button>
+                </form>
+            </div>
+        {% empty %}
+            <div class="card-content"><p>No chores assigned to you. 🎉</p></div>
+        {% endfor %}
+    </div>
+    {% endblock %}
+
+{% block fab %}
+    <a onclick="openModal()" class="fab">+</a>
+{% endblock %}
+
+{% block modal_content %}
+    <div class="modal-header">
+        <h2>Add a New Chore</h2>
+        <button onclick="closeModal()" class="modal-close">&times;</button>
+    </div>
+    <form method="post" class="modal-form">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" name="add-chore">Add Chore</button>
+    </form>
+{% endblock %}

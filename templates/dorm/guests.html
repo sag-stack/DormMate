@@ -1,0 +1,50 @@
+{% extends "dorm/base.html" %}
+
+{% block title %}Guests{% endblock %}
+{% block page_title %}Guests{% endblock %}
+
+{% block content %}
+    <div class="card">
+        <div class="card-header">
+            <h2>Current & Upcoming Guests</h2>
+        </div>
+        {% for guest in guests %}
+            <div class="list-item">
+                <div class="list-item-content">
+                    <strong>{{ guest.guest_name }}</strong>
+                    <span>Host: {{ guest.hosted_by.profile.display_name }}</span>
+            </div>
+        
+            {% if guest.hosted_by == request.user %}
+            <a href="{% url 'edit_guest' pk=guest.id %}" style="color: var(--primary-blue); font-size: 18px; text-decoration: none; margin-left: 15px;">
+                <i class="fas fa-edit"></i>
+            </a>
+            {% endif %}
+
+            <div class="list-item-action" style="font-size: 14px; text-align: right; margin-left: 15px;">
+                {{ guest.arrival_time|date:"M. j" }} - {{ guest.departure_time|date:"M. j" }}
+            </div>
+        </div>
+        {% empty %}
+            <div class="card-content">
+                <p>No guests logged.</p>
+            </div>
+        {% endfor %}
+    </div>
+{% endblock %}
+
+{% block fab %}
+    <a onclick="openModal()" class="fab">+</a>
+{% endblock %}
+
+{% block modal_content %}
+    <div class="modal-header">
+        <h2>Add a New Guest</h2>
+        <button onclick="closeModal()" class="modal-close">&times;</button>
+    </div>
+    <form method="post" class="modal-form">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" name="add-guest">Add Guest</button>
+    </form>
+{% endblock %}

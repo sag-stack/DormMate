@@ -1,0 +1,59 @@
+{% extends "dorm/base.html" %}
+
+{% block title %}Updates{% endblock %}
+{% block page_title %}Announcements{% endblock %}
+
+{% block content %}
+    <div class="card">
+        <div class="card-header">
+            <h2>All Announcements</h2>
+        </div>
+        {% for announcement in announcements %}
+            <div class="list-item" style="display: block; padding: 20px; position: relative;">
+                
+                {% if announcement.posted_by == request.user %}
+                    <div style="position: absolute; top: 15px; right: 15px; display: flex; gap: 10px;">
+                        
+                        <a href="{% url 'edit_announcement' pk=announcement.id %}" style="color: var(--primary-blue); font-size: 18px; text-decoration: none;">
+                            <i class="fas fa-edit"></i>
+                        </a>
+                        
+                        <form method="post" action="{% url 'delete_announcement' pk=announcement.id %}" style="margin: 0;" onsubmit="return confirm('Are you sure you want to delete this announcement?');">
+                            {% csrf_token %}
+                            <button type="submit" style="background: none; border: none; padding: 0; margin: 0; cursor: pointer; color: var(--red); font-size: 18px;">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </form>
+                        
+                    </div>
+                {% endif %}
+                
+                <strong style="display: block; font-size: 16px; margin-bottom: 8px; padding-right: 60px;">{{ announcement.title }}</strong>
+                <p style="margin: 0 0 12px 0; color: var(--text-dark); line-height: 1.5;">{{ announcement.message }}</p>
+                <span style="font-size: 12px; color: var(--text-light);">
+                    Posted by {{ announcement.posted_by.profile.display_name }} on {{ announcement.created_at|date:"M. j, Y" }}
+                </span>
+            </div>
+        {% empty %}
+            <div class="card-content">
+                <p>No announcements.</p>
+            </div>
+        {% endfor %}
+    </div>
+{% endblock %}
+
+{% block fab %}
+    <a onclick="openModal()" class="fab">+</a>
+{% endblock %}
+
+{% block modal_content %}
+    <div class="modal-header">
+        <h2>Post an Announcement</h2>
+        <button onclick="closeModal()" class="modal-close">&times;</button>
+    </div>
+    <form method="post" class="modal-form">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" name="add-announcement">Post</button>
+    </form>
+{% endblock %}

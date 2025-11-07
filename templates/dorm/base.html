@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DormMate - {% block title %}Home{% endblock %}</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        :root {
+            --primary-blue: #0052cc;
+            --white: #ffffff;
+            --grey-light: #f4f5f7;
+            --text-dark: #172b4d;
+            --text-light: #505f79;
+            --border-color: #dfe1e6;
+            --shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            --red: #de350b;
+        }
+        body, html {
+            height: 100%;
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--grey-light);
+            color: var(--text-dark);
+            padding-bottom: 70px;
+        }
+        
+        /* --- Header --- */
+        .header {
+            background-color: var(--white);
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border-color);
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        .header h1 { margin: 0; font-size: 24px; font-weight: 600; }
+
+        /* --- Main Content Area --- */
+        .content { padding: 16px; }
+
+        /* --- Card Styles --- */
+        .card {
+            background-color: var(--white);
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+            margin-bottom: 16px;
+            overflow: hidden;
+        }
+        .card-header { padding: 16px 20px; border-bottom: 1px solid var(--border-color); }
+        .card-header h2 { margin: 0; font-size: 18px; }
+        .card-content { padding: 20px; }
+        .card-content p { margin: 0 0 16px 0; color: var(--text-light); }
+
+        /* --- List Item Styles --- */
+        .list-item { display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; border-bottom: 1px solid var(--border-color); }
+        .list-item:last-child { border-bottom: none; }
+        .list-item-content { flex-grow: 1; }
+        .list-item-content strong { display: block; font-size: 16px; color: var(--text-dark); }
+        .list-item-content span { font-size: 14px; color: var(--text-light); }
+        .list-item-action { font-weight: 600; color: var(--primary-blue); }
+
+        /* --- Bottom Navigation Bar --- */
+        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; height: 60px; background-color: var(--white); display: flex; justify-content: space-around; align-items: center; border-top: 1px solid var(--border-color); box-shadow: 0 -1px 5px rgba(0, 0, 0, 0.05); }
+        .nav-item { display: flex; flex-direction: column; align-items: center; text-decoration: none; color: var(--text-light); font-size: 10px; padding: 8px 0; flex-grow: 1; }
+        .nav-item i { font-size: 20px; margin-bottom: 4px; }
+        .nav-item.active { color: var(--primary-blue); }
+
+        /* --- (NEW) Floating Action Button (FAB) --- */
+        .fab {
+            position: fixed;
+            bottom: 80px; /* Above the nav bar */
+            right: 20px;
+            width: 56px;
+            height: 56px;
+            background-color: var(--primary-blue);
+            color: var(--white);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            font-weight: 300;
+            text-decoration: none;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            z-index: 20;
+            cursor: pointer;
+        }
+
+        /* --- (NEW) Modal (Floating Card) Styles --- */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            /* Use flex to center the modal */
+            display: none; /* Hidden by default */
+            align-items: center;
+            justify-content: center;
+            z-index: 30;
+            padding: 16px;
+            box-sizing: border-box;
+        }
+        .modal-content {
+            background-color: var(--white);
+            border-radius: 12px;
+            padding: 24px;
+            width: 100%;
+            max-width: 500px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            max-height: 90vh; /* Max height */
+            overflow-y: auto; /* Scroll if content is too tall */
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .modal-header h2 {
+            margin: 0;
+            font-size: 20px;
+            color: var(--text-dark);
+        }
+        .modal-close {
+            font-size: 28px;
+            font-weight: 300;
+            color: var(--text-light);
+            cursor: pointer;
+            border: none;
+            background: none;
+        }
+        
+        /* --- (NEW) Form Styles (for the modal) --- */
+        .modal-form label {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 6px;
+            display: block;
+        }
+        .modal-form input[type="text"],
+        .modal-form input[type="number"],
+        .modal-form input[type="date"],
+        .modal-form input[type="datetime-local"],
+        .model-form input[type="email"],
+        .modal-form select,
+        .modal-form textarea {
+            font-size: 16px;
+            padding: 10px 14px;
+            width: 100%;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            box-sizing: border-box;
+            margin-bottom: 16px;
+            font-family: inherit;
+        }
+        .modal-form button {
+            font-size: 16px;
+            font-weight: 600;
+            padding: 12px;
+            width: 100%;
+            border: none;
+            border-radius: 6px;
+            background-color: var(--primary-blue);
+            color: var(--white);
+            cursor: pointer;
+        }
+        .modal-form .errorlist {
+            list-style: none;
+            padding: 10px;
+            margin: 0 0 16px 0;
+            color: var(--red);
+            background-color: #ffebe6;
+            border: 1px solid var(--red);
+            border-radius: 6px;
+        }
+
+
+        .toast-container {
+            position: fixed;
+            top: 70px; /* Below the header */
+            right: 16px;
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .toast {
+            background-color: #006644; /* Success green */
+            color: white;
+            padding: 12px 20px;
+            border-radius: 6px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            font-size: 15px;
+            font-weight: 500;
+            /* Animation */
+            animation: slideIn 0.3s ease-out forwards, fadeOut 0.3s ease-in 3s forwards;
+        }
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        @keyframes fadeOut {
+            from { opacity: 1; }
+            to { opacity: 0; visibility: hidden; }
+        }
+    </style>
+</head>
+<body>
+    {% if messages %}
+    <div class="toast-container">
+        {% for message in messages %}
+            <div class="toast">{{ message }}</div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    <div class="header" style="display: flex; justify-content: space-between; align-items: center;">
+        
+        <h1 style="margin: 0;">
+            {% block page_title %}
+                {% if request.resolver_match.url_name == 'home' %}
+                    {{ household.name|default:"DormMate" }}
+                {% endif %}
+            {% endblock %}
+        </h1>
+        
+        <a href="{% url 'settings' %}" style="color: var(--text-dark); ...">
+            <i class="fas fa-cog"></i>
+        </a>
+    </div>
+
+    <div class="content">
+        {% block content %}{% endblock %}
+    </div>
+
+    <nav class="bottom-nav">
+        <a href="{% url 'home' %}" class="nav-item {% if request.resolver_match.url_name == 'home' %}active{% endif %}"><i class="fas fa-home"></i>Home</a>
+        <a href="{% url 'chores' %}" class="nav-item {% if request.resolver_match.url_name == 'chores' %}active{% endif %}"><i class="fas fa-tasks"></i>Chores</a>
+        <a href="{% url 'expenses' %}" class="nav-item {% if request.resolver_match.url_name == 'expenses' %}active{% endif %}"><i class="fas fa-receipt"></i>Expenses</a>
+        <a href="{% url 'grocery' %}" class="nav-item {% if request.resolver_match.url_name == 'grocery' %}active{% endif %}"><i class="fas fa-shopping-cart"></i>Grocery</a>
+        <a href="{% url 'guests' %}" class="nav-item {% if request.resolver_match.url_name == 'guests' %}active{% endif %}"><i class="fas fa-user-friends"></i>Guests</a>
+        <a href="{% url 'announcements' %}" class="nav-item {% if request.resolver_match.url_name == 'announcements' %}active{% endif %}"><i class="fas fa-bullhorn"></i>Updates</a>
+        {% if unread_count > 0 %}
+        <span style="position: absolute; top: 4px; right: 28px; background: var(--red); color: white; border-radius: 50%; width: 18px; height: 18px; font-size: 12px; display: flex; align-items: center; justify-content: center; font-weight: 600;">
+            {{ unread_count }}
+        </span>
+        {% endif %}
+        
+        <i class="fas fa-bell"></i>
+        Notify
+        </a>
+    </nav>
+    
+    {% block fab %}{% endblock %}
+
+    <div id="form-modal" class="modal-overlay">
+        <div class="modal-content">
+            
+            {% block modal_content %}{% endblock %}
+
+        </div>
+    </div>
+
+    <script>
+        // Get the modal elements
+        const modal = document.getElementById('form-modal');
+        
+        // Function to open the modal
+        function openModal() {
+            if (modal) modal.style.display = 'flex';
+        }
+
+        // Function to close the modal
+        function closeModal() {
+            if (modal) modal.style.display = 'none';
+        }
+
+        // Close the modal if the user clicks on the dark overlay
+        if (modal) {
+            modal.addEventListener('click', function(event) {
+                // Check if the click is on the overlay itself, not the content
+                if (event.target === modal) {
+                    closeModal();
+                }
+            });
+        }
+    </script>
+
+</body>
+</html>

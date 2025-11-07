@@ -1,0 +1,89 @@
+{% extends "dorm/base.html" %}
+
+{% block title %}Settings{% endblock %}
+{% block page_title %}Settings{% endblock %}
+
+{% block content %}
+    <div class="card">
+        <div class="card-header"><h2>Account Settings</h2></div>
+        <div class="card-content">
+            <form method="post" class="modal-form">
+                {% csrf_token %}
+                {{ p_form.as_p }}
+                <button type="submit" name="update-profile">Update Profile</button>
+            </form>
+        </div>
+        <a href="{% url 'password_change' %}" style="text-decoration: none;">
+            <div class="list-item">
+                <div class="list-item-content"><strong>Change Password</strong></div>
+                <i class="fas fa-key" style="color: var(--text-light); font-size: 20px;"></i>
+            </div>
+        </a>
+    </div>
+
+    {% if household %}
+    <div class="card">
+        <div class="card-header"><h2>Household Settings</h2></div>
+        <div class="card-content">
+            <form method="post" class="modal-form">
+                {% csrf_token %}
+                {{ h_form.as_p }}
+                <button type="submit" name="update-household">Update Name</button>
+            </form>
+        </div>
+        
+        <div class="card-content" style="border-top: 1px solid var(--border-color);">
+            <p style="margin-bottom: 8px;">Share this code with roommates to join:</p>
+            <input type="text" value="{{ household.invite_code }}" readonly 
+                   style="width: 100%; padding: 10px; font-size: 16px; border: 1px solid var(--border-color); border-radius: 6px; text-align: center; box-sizing: border-box; background-color: var(--grey-light);">
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header"><h2>Household Members</h2></div>
+        {% for member in members %}
+        <div class="list-item">
+            <div class="list-item-content">
+                <strong>{{ member.display_name }}</strong>
+                <span>{{ member.user.username }}</span>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="card">
+        <div class="card-header"><h2>Danger Zone</h2></div>
+        <form method="post" action="{% url 'logout' %}" style="margin: 0;">
+            {% csrf_token %}
+            <button type="submit" style="background: none; border: none; padding: 0; margin: 0; width: 100%; cursor: pointer; text-align: left;">
+                <div class="list-item">
+                    <div class="list-item-content"><strong>Log Out</strong></div>
+                    <i class="fas fa-sign-out-alt" style="color: var(--text-light); font-size: 20px;"></i>
+                </div>
+            </button>
+        </form>
+
+        {% if household %}
+        <form method="post" action="{% url 'leave_household' %}" onsubmit="return confirm('Are you sure you want to leave this household?');">
+            {% csrf_token %}
+            <button type="submit" style="background: none; border: none; padding: 0; margin: 0; width: 100%; cursor: pointer;">
+                <div class="list-item">
+                    <div class="list-item-content"><strong style="color: var(--red);">Leave Household</strong></div>
+                    <i class="fas fa-door-open" style="color: var(--red); font-size: 20px;"></i>
+                </div>
+            </button>
+        </form>
+        {% endif %}
+        
+        <form method="post" action="{% url 'delete_account' %}" onsubmit="return confirm('Are you sure? This will permanently delete your account and all your data.');">
+            {% csrf_token %}
+            <button type="submit" style="background: none; border: none; padding: 0; margin: 0; width: 100%; cursor: pointer;">
+                <div class="list-item">
+                    <div class="list-item-content"><strong style="color: var(--red);">Delete Account</strong></div>
+                    <i class="fas fa-trash" style="color: var(--red); font-size: 20px;"></i>
+                </div>
+            </button>
+        </form>
+    </div>
+{% endblock %}

@@ -1,0 +1,46 @@
+{% extends "dorm/base.html" %}
+
+{% block title %}Grocery{% endblock %}
+{% block page_title %}Grocery{% endblock %}
+
+{% block content %}
+    <div class="card">
+        <div class="card-header">
+            <h2>Grocery Items</h2>
+        </div>
+        {% for item in grocery_items %}
+            <div class="list-item">
+                <div class="list-item-content">
+                    <strong>{{ item.item_name }} {% if item.quantity %}({{ item.quantity }}){% endif %}</strong>
+                    <span>Added by {{ item.added_by.profile.display_name }}</span>
+                </div>
+                <form method="post" style="margin: 0;">
+                    {% csrf_token %}
+                    <button type="submit" name="remove-item" value="{{ item.id }}" style="font-size: 14px; color: var(--red); font-weight: 500; text-decoration: none; background: none; border: none; cursor: pointer; padding: 0;">
+                        Remove
+                    </button>
+                </form>
+            </div>
+        {% empty %}
+            <div class="card-content">
+                <p>The grocery list is empty!</p>
+            </div>
+        {% endfor %}
+    </div>
+{% endblock %}
+
+{% block fab %}
+    <a onclick="openModal()" class="fab">+</a>
+{% endblock %}
+
+{% block modal_content %}
+    <div class="modal-header">
+        <h2>Add Grocery Item</h2>
+        <button onclick="closeModal()" class="modal-close">&times;</button>
+    </div>
+    <form method="post" class="modal-form">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" name="add-item">Add Item</button>
+    </form>
+{% endblock %}

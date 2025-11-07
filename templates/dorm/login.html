@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DormMate - Login</title>
+    <style>
+        :root {
+            --primary-blue: #0052cc;
+            --white: #ffffff;
+            --grey: #f4f5f7;
+            --text-dark: #172b4d;
+            --text-light: #505f79;
+        }
+        body, html {
+            height: 100%;
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--primary-blue);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .login-container {
+            width: 100%;
+            max-width: 400px;
+            margin: 16px;
+            padding: 32px;
+            background-color: var(--white);
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        .login-container h1 {
+            color: var(--text-dark);
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+        .login-container p {
+            color: var(--text-light);
+            margin-bottom: 24px;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+        input {
+            font-size: 16px;
+            padding: 12px 16px;
+            margin-bottom: 16px;
+            border: 1px solid #dfe1e6;
+            border-radius: 6px;
+        }
+        button {
+            font-size: 16px;
+            font-weight: 600;
+            padding: 12px;
+            border: none;
+            border-radius: 6px;
+            background-color: var(--primary-blue);
+            color: var(--white);
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        button:hover {
+            background-color: #0041a3;
+        }
+        .signup-.link {
+            margin-top: 24px;
+            font-size: 14px;
+            color: var(--text-light);
+        }
+        .signup-link a {
+            color: var(--primary-blue);
+            font-weight: 600;
+            text-decoration: none;
+        }
+        /* This style is for Django's form errors */
+        .errorlist {
+            list-style: none;
+            padding: 0;
+            margin: 0 0 16px 0;
+            color: #de350b;
+            font-size: 14px;
+            font-weight: 600;
+            background-color: #ffebe6;
+            border: 1px solid #ffbdad;
+            border-radius: 6px;
+            padding: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <h1>DormMate</h1>
+        <p>Welcome back! Please log in.</p>
+
+        {% if form.errors %}
+            {{ form.non_field_errors }}
+        {% endif %}
+
+        <form method="post" action="{% url 'login' %}">
+            {% csrf_token %}
+            
+            <input type="text" name="username" placeholder="Username or Email" required>
+            <input type="password" name="password" placeholder="Password" required>
+            <button type="submit">Login</button>
+        </form>
+
+        <div class="signup-link">
+            Don't have an account? <a href="{% url 'signup' %}">Sign up</a>
+        </div>
+    </div>
+</body>
+</html>

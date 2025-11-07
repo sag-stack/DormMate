@@ -1,0 +1,95 @@
+{% extends "dorm/base.html" %}
+
+{% block title %}Home{% endblock %}
+{% block page_title %}{{ household.name|default:"DormMate" }}{% endblock %}
+
+{% block content %}
+    
+    <div class="card">
+        <div class="card-header">
+            <h2>Your Action Items</h2>
+        </div>
+        
+        {% if not my_pending_chores and not my_unsettled_debts %}
+            <div class="card-content">
+                <p>You're all caught up!</p>
+            </div>
+        {% endif %}
+        
+        {% for chore in my_pending_chores %}
+            <div class="list-item">
+                <div class="list-item-content">
+                    <strong>Chore: {{ chore.title }}</strong>
+                    <span style="color: var(--red);">Due: {{ chore.due_date|date:"M. j" }}</span>
+                </div>
+                <a href="{% url 'chores' %}" class="list-item-action">View</a>
+            </div>
+        {% endfor %}
+        
+        {% for debt in my_unsettled_debts %}
+            <div class="list-item">
+                <div class="list-item-content">
+                    <strong>Debt: ₹{{ debt.amount_owed|floatformat:0 }}</strong>
+                    <span>For "{{ debt.expense.title }}"</span>
+                </div>
+                <a href="{% url 'expenses' %}" class="list-item-action">Settle</a>
+            </div>
+        {% endfor %}
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <h2>Your Balance</h2>
+        </div>
+        <div class="card-content" style="text-align: center;">
+            <h1 style="font-size: 28px; margin: 0 0 8px 0; color: {% if balance > 0 %}#006644{% elif balance < 0 %}var(--red){% else %}var(--text-dark){% endif %};">
+                ₹{{ balance|floatformat:2 }}
+            </h1>
+            <p style="margin:0;">{{ balance_message }}</p>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="list-item">
+            <div class="list-item-content"><strong>Pending Household Chores</strong></div>
+            <div class="list-item-action" style="background-color: #deebff; ...">{{ pending_chore_count }}</div>
+        </div>
+        <div class="list-item">
+            <div class="list-item-content"><strong>Grocery Items Needed</strong></div>
+            <div class="list-item-action" style="background-color: #e6fcff; ...">{{ grocery_item_count }}</div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <h2>Upcoming Household Chores</h2>
+        </div>
+        {% for chore in upcoming_chores %}
+            <div class="list-item">
+                <div class="list-item-content">
+                    <strong>{{ chore.title }}</strong>
+                    <span>{{ chore.assigned_to.profile.display_name }} • Due: {{ chore.due_date|date:"M. j" }}</span>
+                </div>
+            </div>
+        {% empty %}
+            <div class="card-content"><p>No upcoming chores for the household.</p></div>
+        {% endfor %}
+    </div>
+    {% if latest_announcement %}
+    <div class="card">
+        <div class="card-header">
+            <h2>Latest Announcement</h2>
+        </div>
+        <div class="card-content">
+            <strong style="display: block; font-size: 16px; margin-bottom: 8px;">
+                {{ latest_announcement.title }}
+            </strong>
+            <p style="margin: 0 0 12px 0;">{{ latest_announcement.message|truncatewords:20 }}</p>
+            <span style="font-size: 12px; color: var(--text-light);">
+                Posted by {{ latest_announcement.posted_by.profile.display_name }}
+            </span>
+        </div>
+    </div>
+    {% endif %}
+
+{% endblock %}

@@ -1,0 +1,105 @@
+{% extends "dorm/base.html" %}
+
+{% block title %}Expenses{% endblock %}
+{% block page_title %}Expenses{% endblock %}
+
+{% block head_extra %}
+<style>
+    /* ... (your existing checkbox styles) ... */
+    .settle-button { background-color: #006644; color: white; padding: 8px 12px; border-radius: 6px; text-decoration: none; font-size: 14px; font-weight: 600; border: none; cursor: pointer; }
+</style>
+{% endblock %}
+
+{% block content %}
+    <div class="card">
+        <div class="card-content" style="text-align: center;">
+            <span style="font-size: 14px; color: var(--text-light);">Your Net Balance</span>
+            <h2 style="margin: 4px 0; font-size: 24px; color: {% if balance > 0 %}#006644{% elif balance < 0 %}var(--red){% else %}var(--text-dark){% endif %};">
+                ₹{{ balance|floatformat:2 }}
+            </h2>
+        </div>
+    </div>
+    
+    <div class="card">
+        <div class="card-content" style="text-align: center;">
+            <span style="font-size: 14px; color: var(--text-light);">Total You've Paid</span>
+            <h2 style="margin: 4px 0; font-size: 24px;">
+                ₹{{ total_you_paid|floatformat:2 }}
+            </h2>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header"><h2>What You Owe (Unsettled)</h2></div>
+        {% for split in my_debts %}
+            <div class.list-item">
+                <div class="list-item-content">
+                    <strong>₹{{ split.amount_owed }}</strong>
+                    <span>For "{{ split.expense.title }}" (to {{ split.expense.paid_by.profile.display_name }})</span>
+                </div>
+                <form method="post" action="{% url 'settle_expense' pk=split.id %}" style="margin:0;">
+                    {% csrf_token %}
+                    <button type="submit" class="settle-button">Settle</button>
+                </form>
+            </div>
+        {% empty %}
+            <div class="card-content"><p>You don't owe anyone. Settled up!</p></div>
+        {% endfor %}
+    </div>
+
+    <div class="card">
+        <div class="card-header"><h2>What You Are Owed (Unsettled)</h2></div>
+        {% for split in my_credits %}
+            <div class="list-item">
+                <div class.list-item-content">
+                    <strong>₹{{ split.amount_owed }}</strong>
+                    <span>From {{ split.owed_by.profile.display_name }} for "{{ split.expense.title }}"</span>
+                </div>
+                <span style="font-size: 14px; color: var(--text-light);">Pending</span>
+            </div>
+        {% empty %}
+            <div class="card-content"><p>No one owes you anything.</p></div>
+        {% endfor %}
+    </div>
+
+    <div class="card">
+        <div class="card-header"><h2>Settled History</h2></div>
+        {% for split in settled_history %}
+            <div class="list-item" style="opacity: 0.7;">
+                <div class.list-item-content">
+                    <strong>₹{{ split.amount_owed }}</strong>
+                    <span>
+                        {% if split.owed_by == request.user %}
+                            You paid {{ split.expense.paid_by.profile.display_name }}
+                        {% else %}
+                            {{ split.owed_by.profile.display_name }} paid you
+                        {% endif %}
+                        for "{{ split.expense.title }}"
+                    </span>
+                </div>
+                <span style="font-size: 14px; color: #006644;">Settled</span>
+            </div>
+        {% empty %}
+            <div class="card-content"><p>No settled expenses... yet!</p></div>
+        {% endfor %}
+    </div>
+{% endblock %}
+
+{% block fab %}<a onclick="openModal()" class="fab">+</a>{% endblock %}
+{% block modal_content %}
+    <div class="modal-header">
+        <h2>Add a New Expense</h2>
+        <button onclick="closeModal()" class="modal-close">&times;</button>
+    </div>
+    <form method="post" class="modal-form">
+        {% csrf_token %}
+        <label for="{{ form.title.id_for_label }}">{{ form.title.label }}</label>
+        {{ form.title }} {{ form.title.errors }}
+        <label for="{{ form.amount.id_for_label }}">{{ form.amount.label }}</label>
+        {{ form.amount }} {{ form.amount.errors }}
+        <label for="{{ form.split_with.id_for_label }}">{{ form.split_with.label }}</label>
+        <div class="user-checklist">{{ form.split_with }}</div>
+        {{ form.split_with.errors }}
+        <button type="submit" name="add-expense">Add Expense</button>
+    </form>
+{% endblock %}

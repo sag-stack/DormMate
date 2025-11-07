@@ -1,0 +1,16 @@
+{% extends "dorm/base.html" %}
+
+{% block title %}Edit Announcement{% endblock %}
+{% block page_title %}Edit Announcement{% endblock %}
+
+{% block content %}
+    <div class="card">
+        <div class="card-content">
+            <form method="post" class="modal-form">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <button type="submit">Save Changes</button>
+            </form>
+        </div>
+    </div>
+{% endblock %}
